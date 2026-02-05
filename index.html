@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZ AI | Vibe Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #C084FC;
+            --secondary: #6366F1;
+            --accent: #22D3EE;
+            --bg: #030014;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 1s ease;
+        }
+
+        /* Animated Aura Background */
+        .aura-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #030014 100%);
+        }
+
+        .aura-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            transition: background 2s ease, transform 2s ease;
+            animation: move 25s infinite alternate;
+        }
+
+        .blob-1 { background: var(--primary); top: -100px; left: -100px; }
+        .blob-2 { background: var(--secondary); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .blob-3 { background: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse 15s infinite; }
+
+        /* Dynamic State: Thinking/Answering colors */
+        body.is-answering .blob-1 { background: #ff0080; }
+        body.is-answering .blob-2 { background: #7928ca; }
+        body.is-answering .blob-3 { background: #ff4d4d; }
+
+        @keyframes move {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 200px) scale(1.2); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.4; transform: translate(-40%, -60%) scale(1.1); }
+        }
+
+        /* Glassmorphism Styles */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #C084FC 0%, #6366F1 50%, #22D3EE 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* Message Bubbles */
+        .msg-user {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 24px 24px 4px 24px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .msg-bot {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 24px 24px 24px 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animations */
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .typing span {
+            width: 8px; height: 8px; background: var(--primary);
+            border-radius: 50%; display: inline-block;
+            animation: jump 0.6s infinite alternate;
+        }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes jump { to { transform: translateY(-10px); opacity: 0.5; } }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen p-2 md:p-4 gap-4">
+
+    <div class="aura-container">
+        <div class="aura-blob blob-1"></div>
+        <div class="aura-blob blob-2"></div>
+        <div class="aura-blob blob-3"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="w-full md:w-72 glass-card rounded-[32px] p-6 flex flex-col items-center md:items-stretch gap-6 h-auto md:h-full">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-500 flex items-center justify-center shadow-lg">
+                <span class="text-2xl font-black">G</span>
+            </div>
+            <h1 class="text-2xl gradient-text">GenZ AI</h1>
+        </div>
+
+        <!-- Session Info Card -->
+        <div class="glass rounded-3xl p-4 space-y-3 border border-white/10">
+            <div class="flex justify-between items-center text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                <span>Vibe Status</span>
+                <span class="text-green-400 animate-pulse">● Live</span>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs text-white/80">Messages Sent: <span id="msg-count" class="text-purple-400">0</span></p>
+                <p class="text-xs text-white/80">Mode: <span class="text-cyan-400">Hyper-Creative</span></p>
+            </div>
+        </div>
+
+        <button onclick="window.location.reload()" class="hidden md:flex items-center gap-3 w-full bg-white/5 hover:bg-white/10 p-4 rounded-2xl border border-white/5 transition-all active:scale-95 group">
+            <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/20">
+                <svg width="20" height="20" fill="white" viewBox="0 0 256 256"><path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-88a8,8,0,0,1-8,8H136v24a8,8,0,0,1-16,0V136H96a8,8,0,0,1,0-16h24V96a8,8,0,0,1,16,0v24h24A8,8,0,0,1,168,128Z"></path></svg>
+            </div>
+            <span class="font-bold text-sm tracking-wide uppercase">Reset Vibe</span>
+        </button>
+
+        <div class="hidden md:block flex-1 space-y-4">
+            <h3 class="text-[10px] font-black tracking-[0.3em] text-white/30 px-2 uppercase">Core Memories</h3>
+            <div class="space-y-2 no-scrollbar overflow-y-auto max-h-[30vh]">
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/5 text-xs text-white/60 hover:text-white cursor-pointer transition-colors truncate">Slang Translation Engine</div>
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/5 text-xs text-white/60 hover:text-white cursor-pointer transition-colors truncate">Aura Analysis Mode</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Chat Area -->
+    <main class="flex-1 glass-card rounded-[40px] flex flex-col relative overflow-hidden">
+        <div id="chat-content" class="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 no-scrollbar">
+            <!-- Initial Welcome -->
+            <div id="welcome-state" class="h-full flex flex-col items-center justify-center text-center">
+                <div class="relative mb-8">
+                    <div class="absolute inset-0 bg-purple-500 blur-3xl opacity-20 animate-pulse"></div>
+                    <h2 class="text-7xl md:text-9xl font-black gradient-text tracking-tighter">YO.</h2>
+                </div>
+                <p class="text-xl md:text-2xl font-light text-white/60 mb-8 max-w-md italic">Unlock the next level of intelligence.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
+                    <button onclick="quickPrompt('Draft a business plan using only gen-z slang')" class="p-5 glass rounded-3xl text-sm font-bold hover:bg-white/10 border border-white/10 transition-all hover:scale-105">⚡ Slang Business Plan</button>
+                    <button onclick="quickPrompt('Give me a motivation speech but make it chaotic')" class="p-5 glass rounded-3xl text-sm font-bold hover:bg-white/10 border border-white/10 transition-all hover:scale-105">🌀 Chaotic Motivation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="p-6 md:p-10">
+            <div class="max-w-4xl mx-auto relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-[32px] blur opacity-25 group-focus-within:opacity-60 transition duration-500"></div>
+                <div class="relative glass rounded-[30px] p-2 flex items-center gap-2">
+                    <textarea 
+                        id="user-input"
+                        rows="1"
+                        placeholder="Drop a vibe here..."
+                        class="flex-1 bg-transparent border-none focus:ring-0 text-white px-6 py-4 resize-none text-lg placeholder:text-white/20"
+                        oninput="autoGrow(this)"
+                    ></textarea>
+                    <button id="send-btn" onclick="handleSend()" class="p-4 bg-white text-black rounded-2xl hover:bg-purple-400 transition-all active:scale-90 shadow-xl group/btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-12 transition-transform"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="text-[10px] text-center mt-4 text-white/20 font-bold uppercase tracking-widest">End-to-End Encryption • Vibe Check Pass</div>
+        </div>
+    </main>
+
+    <script>
+        const chatContent = document.getElementById('chat-content');
+        const userInput = document.getElementById('user-input');
+        const welcomeState = document.getElementById('welcome-state');
+        const msgCounter = document.getElementById('msg-count');
+        let count = 0;
+
+        function autoGrow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        function quickPrompt(text) {
+            userInput.value = text;
+            handleSend();
+        }
+
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            if (welcomeState) welcomeState.remove();
+
+            // Background Shift: Active
+            document.body.classList.add('is-answering');
+
+            // User Message
+            addMessage('user', text);
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            count++;
+            msgCounter.innerText = count;
+
+            // Bot Typing Indicator
+            const botMsgId = addMessage('bot', '<div class="typing"><span></span><span></span><span></span></div>');
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ msg: text })
+                });
+                const data = await response.text();
+                
+                // Animate bot response
+                typeWriter(botMsgId, data);
+            } catch (err) {
+                updateMessage(botMsgId, "L + Ratio + My servers are down. Try again?");
+                document.body.classList.remove('is-answering');
+            }
+        }
+
+        function addMessage(role, content) {
+            const id = 'msg-' + Math.random().toString(36).substr(2, 9);
+            const container = document.createElement('div');
+            container.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} w-full pop-in`;
+            
+            const inner = role === 'user' 
+                ? `<div class="msg-user px-6 py-4 max-w-[85%] text-white font-medium">${content}</div>`
+                : `<div class="flex gap-4 max-w-[90%] items-start">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex-shrink-0 flex items-center justify-center text-white shadow-lg font-bold">Z</div>
+                    <div id="${id}" class="msg-bot px-7 py-5 text-white/90 leading-relaxed text-lg shadow-2xl">${content}</div>
+                   </div>`;
+
+            container.innerHTML = inner;
+            chatContent.appendChild(container);
+            chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' });
+            return id;
+        }
+
+        function typeWriter(id, text) {
+            const el = document.getElementById(id);
+            el.innerHTML = '';
+            let i = 0;
+            const speed = 20; // ms per char
+
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                    setTimeout(type, speed);
+                } else {
+                    // Reset background after finishing response
+                    setTimeout(() => {
+                        document.body.classList.remove('is-answering');
+                    }, 500);
+                }
+            }
+            type();
+        }
+
+        function updateMessage(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = text;
+        }
+    </script>
+</body>
+</html>
